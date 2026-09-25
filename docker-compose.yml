@@ -1,0 +1,21 @@
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: spire-rag-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: spire
+      POSTGRES_PASSWORD: spire
+      POSTGRES_DB: spire_rag
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U spire -d spire_rag"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:
