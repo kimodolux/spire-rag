@@ -127,8 +127,8 @@ One Postgres database holds text, vectors, the full-text index and the entity gr
 
 | Table | Key columns | Notes |
 | --- | --- | --- |
-| books | id, title, short_code, book_type | One row per sourcebook |
-| sections | id, book_id, parent_id, title, path, page_start, page_end | The heading tree; parent-document retrieval returns these |
+| books | id, title, short_code, book_type | One row per sourcebook. book_type is descriptive metadata (core, supplement); it does not mark scenario content, since scenarios live inside source books — that split is per-section, see sections.status |
+| sections | id, book_id, parent_id, title, path, page_start, page_end, status | The heading tree; parent-document retrieval returns these. status is included, excluded or suspected_scenario (set by ingest step 3), so scenario exclusion happens per-section, not per-book |
 | chunks | id, section_id, text, embed_text, content_type, mechanics[], page_start, page_end, canonical_id, tsv, embedding | tsv is a generated tsvector; embedding is vector(N) with an HNSW index |
 | chunk_locations | chunk_id, book_id, page | All locations of a deduplicated chunk |
 | section_refs | from_chunk_id, to_section_id, raw_text | Parsed cross-references such as "see p. 212" |
@@ -319,4 +319,4 @@ Still open:
 
 ## Future work
 
-- **Scenario books and spoiler control.** Add scenario books and the excluded scenario chapters with a `gm_only` flag on chunks and entities, a GM or player access level per session taken from the auth token, and filtering applied in SQL rather than the prompt. `books.book_type` is kept in v1 so this needs no schema redesign.
+- **Scenario books and spoiler control.** Scenario content lives in sections, not whole books, so `sections.status` is the seam. v1 marks excluded scenario sections `excluded` and drops them at ingest; later work ingests them instead and lets `status` drive a `gm_only` flag that propagates section → chunk → entity, a GM or player access level per session taken from the auth token, and filtering applied in SQL rather than the prompt. Because the classification is per-section from the start, this needs no schema redesign.
