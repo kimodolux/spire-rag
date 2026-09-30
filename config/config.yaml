@@ -1,0 +1,10 @@
+# Pipeline settings (non-secret). Secrets come from environment variables.
+#
+# The embedding values here are the runtime contract that check_embedding_config()
+# enforces against the embedding_config table. dims must match the vector(N)
+# columns created by the migration (EMBED_DIM). Change the model here and
+# re-migrate together if the dimension ever changes.
+embedding:
+  model: Alibaba-NLP/gte-large-en-v1.5
+  version: v1
+  dims: 1024
